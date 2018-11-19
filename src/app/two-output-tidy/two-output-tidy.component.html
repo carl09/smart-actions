@@ -1,0 +1,11 @@
+<app-chart *ngFor="let i of items" class="chart" [labels]="i.labels">
+  <app-series
+    *ngFor="let x of i.robots"
+    [label]="x.name"
+    [color]="x.color"
+    [values]="x.getDiffs()"
+    (select)="onSelect(x)"
+  ></app-series>
+</app-chart>
+
+<button (click)="runAgain()">Add New</button>

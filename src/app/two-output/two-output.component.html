@@ -1,0 +1,10 @@
+<app-chart *ngFor="let i of items" class="chart" [labels]="labels">
+  <app-series
+    *ngFor="let x of i"
+    [label]="x.name"
+    [color]="x.color"
+    [values]="x.values"
+  ></app-series>
+</app-chart>
+
+<button (click)="runAgain()">Add New</button>

@@ -7,7 +7,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "runner": "ts-node ./runner.ts"
   },
   "private": true,
   "dependencies": {
@@ -20,19 +21,24 @@
     "@angular/platform-browser": "^7.0.4",
     "@angular/platform-browser-dynamic": "^7.0.4",
     "@angular/router": "^7.0.4",
+    "@tensorflow/tfjs": "^0.13.5",
+    "bootstrap": "^4.1.3",
     "core-js": "^2.5.4",
     "rxjs": "~6.3.3",
-    "zone.js": "~0.8.26"
+    "zone.js": "~0.8.26",
+    "chart.js": "^2.7.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.10.0",
     "@angular/cli": "~7.0.6",
     "@angular/compiler-cli": "^7.0.4",
     "@angular/language-service": "^7.0.4",
+    "@types/chart.js": "^2.7.40",
     "@types/jasmine": "~3.3.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~10.12.9",
     "codelyzer": "~4.5.0",
+    "husky": "^1.1.4",
     "jasmine-core": "~3.3.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~3.1.1",
@@ -40,7 +46,6 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
-    "husky": "^1.1.4",
     "prettier": "^1.15.2",
     "pretty-quick": "^1.8.0",
     "ts-node": "~7.0.0",
