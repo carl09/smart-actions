@@ -1,6 +1,34 @@
 import { scoreResponse, withInTollerance } from './array-utils';
 import { ClimateFanSpeed, ClimateMode, ClimateResponse } from './models';
 
+interface Room {
+  note?: string;
+  requestedTemp: number;
+  actualTemp: number;
+  outsideTemp: number;
+  mode: ClimateMode;
+  fanSpeed: ClimateFanSpeed;
+  score: number;
+  adjustedTemp: number;
+}
+
+const setAirCon = (env: Room): { score: number; temp: number } => {
+  const temp1 = env.requestedTemp - env.actualTemp;
+  const temp2 = env.outsideTemp - env.requestedTemp;
+
+  const resp: ClimateResponse = {
+    mode: env.mode,
+    fanSpeed: env.fanSpeed,
+  };
+
+  const score = scoreResponse(temp1, temp2 < 0, resp, true);
+
+  return {
+    score: score.points,
+    temp: env.actualTemp + score.adjustment,
+  };
+};
+
 describe('Array-Utils', () => {
   describe('withInTollerance', () => {
     it('Value True', () => {
@@ -156,31 +184,3 @@ describe('Array-Utils', () => {
     });
   });
 });
-
-interface Room {
-  note?: string;
-  requestedTemp: number;
-  actualTemp: number;
-  outsideTemp: number;
-  mode: ClimateMode;
-  fanSpeed: ClimateFanSpeed;
-  score: number;
-  adjustedTemp: number;
-}
-
-const setAirCon = (env: Room): { score: number; temp: number } => {
-  const temp1 = env.requestedTemp - env.actualTemp;
-  const temp2 = env.outsideTemp - env.requestedTemp;
-
-  const resp: ClimateResponse = {
-    mode: env.mode,
-    fanSpeed: env.fanSpeed,
-  };
-
-  const score = scoreResponse(temp1, temp2 < 0, resp, true);
-
-  return {
-    score: score.points,
-    temp: env.actualTemp + score.adjustment,
-  };
-};

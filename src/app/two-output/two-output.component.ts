@@ -8,6 +8,15 @@ export interface ChartItem {
   values: number[];
 }
 
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
 @Component({
   selector: 'app-two-output',
   templateUrl: './two-output.component.html',
@@ -82,12 +91,3 @@ export class TwoOutputComponent implements OnInit {
     this.items.push(t);
   }
 }
-
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
