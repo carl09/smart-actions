@@ -24,6 +24,9 @@ const getRandomColor = () => {
 })
 export class TwoOutputComponent implements OnInit {
   public items: ChartItem[][] = [];
+
+  public isRunning = false;
+
   public labels: string[] = [
     '1',
     '2',
@@ -53,19 +56,18 @@ export class TwoOutputComponent implements OnInit {
     this.trainer = new Trainer(ModelTwoOutput, 24);
   }
 
-  ngOnInit(): void {
-    this.trainer.preLoad().then(() => {
-      this.run();
-    });
-  }
+  ngOnInit(): void {}
 
   runAgain() {
-    this.trainer.results().then(() => {
+    if (!this.isRunning) {
+      this.isRunning = true;
+      this.trainer.results();
       this.run();
-    });
+    }
   }
 
   private run() {
+    console.log('run');
     const other = this.trainer.run(20);
 
     const run = this.trainer.getBest();
@@ -89,5 +91,6 @@ export class TwoOutputComponent implements OnInit {
     }
 
     this.items.push(t);
+    this.isRunning = false;
   }
 }

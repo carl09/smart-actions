@@ -65,7 +65,6 @@ export const robotDemo = async () => {
 
   const rlast = new Robot(ModelTwoOutput, 24, 18);
   rlast.setWeights(w1, w2, r1.getWeights(), r2.getWeights());
-  // await rlast.setMoves(moves);
 
   rlast.guess(20);
   rlast.guess(20);

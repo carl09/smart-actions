@@ -114,10 +114,6 @@ export class Robot<T extends ModelOutput> {
     return this.goodMoves;
   }
 
-  async setMoves(moves: MoveAndResult[]) {
-    await this.model.setMoves(moves);
-  }
-
   getWeights(): WeightsMatrix[] {
     return this.model.getWeights();
   }

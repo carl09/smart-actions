@@ -5,7 +5,6 @@ import {
   ClimateMode,
   ClimateResponse,
   ModelOutput,
-  MoveAndResult,
   WeightsMatrix,
 } from './models';
 
@@ -158,28 +157,5 @@ export class ModelOneOutput implements ModelOutput {
     });
 
     return response;
-  }
-
-  async setMoves(moves: MoveAndResult[]) {
-    if (!moves || moves.length === 0) {
-      return;
-    }
-    const xs = tf.tensor2d(moves.map(x => x.input), undefined, 'float32');
-    const labels_ts = tf.tensor1d(moves.map(x => enumToResp(x.fanSpeed, x.mode)), 'int32');
-
-    const ys = tf.oneHot(labels_ts, 8);
-
-    const config: tf.ModelFitConfig = {
-      epochs: 2,
-      shuffle: true,
-    };
-
-    await this.model.fit(xs, ys, config);
-
-    xs.dispose();
-    labels_ts.dispose();
-    ys.dispose();
-
-    // console.log(history);
   }
 }

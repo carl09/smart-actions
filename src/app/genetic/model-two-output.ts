@@ -5,7 +5,6 @@ import {
   ClimateMode,
   ClimateResponse,
   ModelOutput,
-  MoveAndResult,
   WeightsMatrix,
 } from './models';
 
@@ -81,7 +80,7 @@ export class ModelTwoOutput implements ModelOutput {
     }
   }
 
-  public guess(requestTempDiff: number, outsideTempDiff: number): ClimateResponse {
+  guess(requestTempDiff: number, outsideTempDiff: number): ClimateResponse {
     let response: ClimateResponse;
 
     tf.tidy(() => {
@@ -102,24 +101,5 @@ export class ModelTwoOutput implements ModelOutput {
     });
 
     return response;
-  }
-
-  async setMoves(moves: MoveAndResult[]) {
-    // const xs = tf.tensor2d(moves.map(x => x.input), undefined, "float32");
-    // const labels_ts = tf.tensor1d(moves.map(x => x.fanOutput), "int32");
-    // const ys = tf.oneHot(labels_ts, 4);
-    // // const learningRate = 0.5;
-    // // const optimizer = tf.train.sgd(learningRate);
-    // // for (let iter = 0; iter < 2; iter++) {
-    // //   optimizer.minimize(() => {
-    // //     const predsYs = predict(xs);
-    // //     return loss(predsYs, ys);
-    // //   });
-    // // }
-    // xs.dispose();
-    // labels_ts.dispose();
-    // ys.dispose();
-    // return await undefined;
-    // console.log(history);
   }
 }

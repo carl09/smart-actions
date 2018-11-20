@@ -24,16 +24,11 @@ export class TwoOutputTidyComponent implements OnInit {
     this.trainer = new Trainer(ModelTwoOutput, 24);
   }
 
-  ngOnInit(): void {
-    this.trainer.preLoad().then(() => {
-      this.run(20);
-    });
-  }
+  ngOnInit(): void {}
 
   runAgain() {
-    this.trainer.results().then(() => {
-      this.run(20);
-    });
+    this.trainer.results();
+    this.run(20);
   }
 
   onSelect(robot: Robot<ModelTwoOutput>) {

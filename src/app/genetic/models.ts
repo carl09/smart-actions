@@ -31,5 +31,4 @@ export interface ModelOutput {
   getWeights(): WeightsMatrix[];
   setWeights(...weights: WeightsMatrix[][]);
   guess(requestTempDiff: number, outsideTempDiff: number): ClimateResponse;
-  setMoves(moves: MoveAndResult[]): Promise<void>;
 }

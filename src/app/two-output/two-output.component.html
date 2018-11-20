@@ -1,3 +1,7 @@
+<div class="top-panel">
+  <button (click)="runAgain()" class="btn btn-primary" [disabled]="isRunning">Add New</button>
+</div>
+
 <app-chart *ngFor="let i of items" class="chart" [labels]="labels">
   <app-series
     *ngFor="let x of i"
@@ -6,5 +10,3 @@
     [values]="x.values"
   ></app-series>
 </app-chart>
-
-<button (click)="runAgain()">Add New</button>

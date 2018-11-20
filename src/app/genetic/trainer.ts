@@ -7,16 +7,9 @@ export class Trainer<T extends ModelOutput> {
 
   private population = 10;
 
-  constructor(private modelCtor: new () => T, public requiredTemp: number) {
-    this.positiveRoberts = [];
-  }
+  constructor(private modelCtor: new () => T, public requiredTemp: number) {}
 
-  async preLoad() {
-    this.positiveRoberts = await this.createRoberts(this.requiredTemp - 6);
-    this.negitiveRoberts = await this.createRoberts(this.requiredTemp + 6);
-  }
-
-  async createRoberts(outsideTemp: number, moves?: MoveAndResult[], ...weights: WeightsMatrix[][]) {
+  createRoberts(outsideTemp: number, moves?: MoveAndResult[], ...weights: WeightsMatrix[][]) {
     const roberts: Array<Robot<T>> = [];
 
     for (let index = 0; index < this.population; index++) {
@@ -24,7 +17,6 @@ export class Trainer<T extends ModelOutput> {
 
       if (weights && weights.length !== 0) {
         r.setWeights(...weights);
-        await r.setMoves(moves);
       }
 
       roberts.push(r);
@@ -42,6 +34,7 @@ export class Trainer<T extends ModelOutput> {
         t = robert.guess(t);
       }
       results.push(robert.getDiffs());
+      setTimeout(() => {}, 10);
     }
 
     for (const robert of this.negitiveRoberts) {
@@ -103,7 +96,13 @@ export class Trainer<T extends ModelOutput> {
     return [p2[0], n2[0], p3[0], n3[0]];
   }
 
-  async results(verbose?: boolean) {
+  results(verbose?: boolean) {
+    if (!this.positiveRoberts || this.positiveRoberts.length === 0) {
+      this.positiveRoberts = this.createRoberts(this.requiredTemp - 6);
+      this.negitiveRoberts = this.createRoberts(this.requiredTemp + 6);
+      return;
+    }
+
     if (verbose) {
       console.warn('----------------- Results');
     }
@@ -124,23 +123,23 @@ export class Trainer<T extends ModelOutput> {
 
     const best = this.getBest(verbose);
 
-    this.positiveRoberts = await this.createRoberts(
+    this.positiveRoberts = this.createRoberts(
       this.requiredTemp - 6,
       moves,
       ...best.map(x => x.getWeights()),
     );
 
-    this.negitiveRoberts = await this.createRoberts(
+    this.negitiveRoberts = this.createRoberts(
       this.requiredTemp + 6,
       moves,
       ...best.map(x => x.getWeights()),
     );
   }
 
-  async iterate(count: number, verbose?: boolean) {
+  iterate(count: number, verbose?: boolean) {
     for (let index = 0; index < count; index++) {
       this.run(10);
-      await this.results(verbose);
+      this.results(verbose);
     }
   }
 }

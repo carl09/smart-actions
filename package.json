@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+    "tidy": "pretty-quick --staged && ng lint",
     "e2e": "ng e2e",
     "runner": "ts-node ./runner.ts"
   },
