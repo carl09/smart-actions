@@ -1,4 +1,4 @@
-import { scoreResponse, withInTollerance } from './array-utils';
+import { getAdjustment, scoreAdjustment, withInTollerance } from './array-utils';
 import { ClimateFanSpeed, ClimateMode, ClimateResponse } from './models';
 
 interface Room {
@@ -21,11 +21,15 @@ const setAirCon = (env: Room): { score: number; temp: number } => {
     fanSpeed: env.fanSpeed,
   };
 
-  const score = scoreResponse(temp1, temp2 < 0, resp, true);
+  const isHeatingRequired = temp2 < 0;
+
+  const adjustment = getAdjustment(temp1, isHeatingRequired, resp, true);
+
+  const points = scoreAdjustment(temp1, isHeatingRequired, adjustment, resp.mode, true);
 
   return {
-    score: score.points,
-    temp: env.actualTemp + score.adjustment,
+    score: points,
+    temp: env.actualTemp + adjustment,
   };
 };
 

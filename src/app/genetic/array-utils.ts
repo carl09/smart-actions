@@ -104,14 +104,13 @@ export const scoreAdjustment = (
   return 0;
 };
 
-export const scoreResponse = (
+export const getAdjustment = (
   requestTempDiff: number,
   isHeatingRequired: boolean,
   response: ClimateResponse,
   verbose?: boolean,
-): { adjustment: number; points: number } => {
+): number => {
   let adjustment = 0;
-  let points = 0;
 
   if (response.mode === ClimateMode.Heating) {
     switch (response.fanSpeed) {
@@ -153,17 +152,7 @@ export const scoreResponse = (
     (response.mode === ClimateMode.Heating && isHeatingRequired) ||
     (response.mode === ClimateMode.Cooling && !isHeatingRequired)
   ) {
-    points = scoreAdjustment(
-      requestTempDiff,
-      isHeatingRequired,
-      adjustment,
-      response.mode,
-      verbose,
-    );
   }
 
-  return {
-    adjustment: adjustment * 1,
-    points,
-  };
+  return adjustment * 1;
 };

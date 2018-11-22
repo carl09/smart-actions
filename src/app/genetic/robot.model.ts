@@ -1,4 +1,4 @@
-import { scoreResponse } from './array-utils';
+import { getAdjustment, scoreAdjustment } from './array-utils';
 import {
   ClimateFanSpeed,
   ClimateMode,
@@ -19,7 +19,7 @@ export class Robot<T extends ModelOutput> {
 
   private model: T;
 
-  constructor(c: new () => T, private requestedTemp: number, private outsideTemp: number) {
+  constructor(c: new () => T, private requestedTemp: number, public outsideTemp: number) {
     this.requestedTemp = requestedTemp;
 
     this.model = new c();
@@ -49,8 +49,8 @@ export class Robot<T extends ModelOutput> {
     };
   }
 
-  guess(temp: number) {
-    const temp1 = this.requestedTemp - temp;
+  guess(temp: number, verbose?: boolean) {
+    const requestTempDiff = this.requestedTemp - temp;
     const temp2 = this.outsideTemp - this.requestedTemp;
 
     // console.log('Is Heating Required', temp2 < 0 )
@@ -63,31 +63,41 @@ export class Robot<T extends ModelOutput> {
     //   ambentDiff: temp2
     // })
 
-    const response: ClimateResponse = this.model.guess(temp1, temp2);
+    const isHeatingRequired = temp2 < 0;
 
-    const score = scoreResponse(temp1, temp2 < 0, response);
+    const response: ClimateResponse = this.model.guess(requestTempDiff, temp2);
 
-    // console.log("guess", {
-    //   temp1,
-    //   fanSpeed: ClimateFanSpeed[response.fanSpeed],
-    //   mode: ClimateMode[response.mode],
-    //   points: score.points,
-    //   adjustment: score.adjustment
-    // });
+    const adjustment = getAdjustment(requestTempDiff, isHeatingRequired, response, verbose);
 
-    if (score.points > 0) {
+    const points = scoreAdjustment(
+      requestTempDiff,
+      isHeatingRequired,
+      adjustment,
+      response.mode,
+      verbose,
+    );
+
+    console.log('guess', {
+      requestTempDiff,
+      fanSpeed: ClimateFanSpeed[response.fanSpeed],
+      mode: ClimateMode[response.mode],
+      points,
+      adjustment,
+    });
+
+    if (points > 0) {
       this.goodMoves.push({
-        input: [temp1, temp2],
+        input: [requestTempDiff, temp2],
         fanSpeed: response.fanSpeed,
         mode: response.mode,
       });
     }
 
-    this.robotScore += score.points;
+    this.robotScore += points;
 
-    this.lastDiff.push(temp1);
+    this.lastDiff.push(requestTempDiff);
 
-    this.resultTemp = temp + score.adjustment;
+    this.resultTemp = temp + adjustment;
 
     return this.resultTemp;
   }
