@@ -1,0 +1,123 @@
+import axios from 'axios';
+import * as admin from 'firebase-admin';
+import { globalDeviceId } from './functions/src/constant';
+import { environment } from './src/environments/environment.prod';
+
+import * as cron from 'node-cron';
+
+admin.initializeApp(environment.firebase);
+
+cron.schedule('*/5 * * * *', () => {
+  axios
+    .get(
+      `https://home.sensibo.com/api/v2/pods/${environment.sensiboDeviceId}/measurements?apiKey=${
+        environment.sensiboApiKey
+      }`,
+    )
+    .then(x => {
+      const result = x.data.result[0];
+
+      admin
+        .database()
+        .ref('/')
+        .child(globalDeviceId)
+        .child('Enviroment')
+        .set({
+          humidity: result.humidity,
+          temperature: result.temperature,
+        });
+
+      console.log(result);
+    })
+    .catch(err => {
+      console.error('measurements', err);
+    });
+});
+
+const getAcState = axios
+  .get(
+    `https://home.sensibo.com/api/v2/pods/${environment.sensiboDeviceId}/?fields=acState&apiKey=${
+      environment.sensiboApiKey
+    }`,
+  )
+  .then(x => {
+    const result = x.data.result.acState;
+
+    admin
+      .database()
+      .ref('/')
+      .child(globalDeviceId)
+      .child('ThermostatMode')
+      .set({
+        thermostatMode: result.mode,
+        temperature: result.targetTemperature,
+        swing: result.swing,
+      });
+
+    console.log(result);
+  })
+  .catch(err => {
+    console.error('acState', err);
+  });
+
+Promise.all([getAcState]).then(() => {
+  admin
+    .database()
+    .ref('/')
+    .child(globalDeviceId)
+    .child('ThermostatMode')
+    .on('value', postSnapshot => {
+      const val: {
+        thermostatMode: string;
+        temperature: number;
+        swing: string;
+      } = postSnapshot.val();
+      console.log(val);
+      axios
+        .post(
+          `https://home.sensibo.com/api/v2/pods/${environment.sensiboDeviceId}/acStates?apiKey=${
+            environment.sensiboApiKey
+          }`,
+          {
+            acState: {
+              mode: val.thermostatMode,
+              targetTemperature: val.temperature,
+              swing: val.swing,
+            },
+          },
+        )
+        .then(response => {
+          console.log('ok acStates');
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    });
+
+  admin
+    .database()
+    .ref('/')
+    .child(globalDeviceId)
+    .child('OnOff')
+    .on('value', postSnapshot => {
+      const val = postSnapshot.val();
+      console.log(val);
+      axios
+        .post(
+          `https://home.sensibo.com/api/v2/pods/${environment.sensiboDeviceId}/acStates?apiKey=${
+            environment.sensiboApiKey
+          }`,
+          {
+            acState: {
+              on: val.on,
+            },
+          },
+        )
+        .then(response => {
+          console.log('ok OnOff');
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    });
+});

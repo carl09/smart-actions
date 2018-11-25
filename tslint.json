@@ -2,7 +2,8 @@
   "rulesDirectory": ["node_modules/codelyzer"],
   "extends": ["tslint:latest", "tslint-angular", "tslint-config-prettier"],
   "rules": {
-    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
+    // "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
+    "no-console": false,
 
     "no-submodule-imports": false,
     "interface-name": false,

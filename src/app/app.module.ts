@@ -1,9 +1,15 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
+import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { ChartComponent } from './chart/chart.component';
 import { SeriesComponent } from './chart/series.component';
+import { DeviceComponent } from './device/device.component';
 import { PopulationComponent } from './population/population.component';
 import { SampleComponent } from './sample/sample.component';
 import { TwoOutputTidyComponent } from './two-output-tidy/two-output-tidy.component';
@@ -14,6 +20,7 @@ const routes: Routes = [
   { path: 'tidy', component: TwoOutputTidyComponent },
   { path: 'sample', component: SampleComponent },
   { path: 'population', component: PopulationComponent },
+  { path: 'device', component: DeviceComponent },
   { path: '', redirectTo: '/two-output', pathMatch: 'full' },
 ];
 
@@ -26,8 +33,16 @@ const routes: Routes = [
     TwoOutputTidyComponent,
     SampleComponent,
     PopulationComponent,
+    DeviceComponent,
   ],
-  imports: [BrowserModule, RouterModule.forRoot(routes)],
+  imports: [
+    BrowserModule,
+    ReactiveFormsModule,
+    RouterModule.forRoot(routes),
+    AngularFireModule.initializeApp(environment.firebase, 'smart-actions'),
+    AngularFireDatabaseModule,
+    HttpClientModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

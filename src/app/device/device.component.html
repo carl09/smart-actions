@@ -1,0 +1,38 @@
+<form [formGroup]="deviceForm" (ngSubmit)="onSubmit()" class="form-inline">
+  <div class="form-group mx-sm-3 mb-2">
+    <input type="checkbox" formControlName="on" class="form-check-input" id="device-on" />
+    <label class="form-check-label" for="device-on">On</label>
+  </div>
+  <div class="form-group mx-sm-3 mb-2">
+    <label for="todo-mode" class="sr-only">Mode</label>
+    <select class="form-control" formControlName="mode" id="todo-mode">
+      <option></option>
+      <option>heat</option>
+      <option>cool</option>
+    </select>
+  </div>
+  <div class="form-group mx-sm-3 mb-2">
+    <label for="todo-temperature" class="sr-only">temperature</label>
+    <input
+      type="number"
+      id="todo-temperature"
+      formControlName="temperature"
+      class="form-control"
+      placeholder="Temperature"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="form-group mx-sm-3 mb-2">
+    <label for="todo-ambientTemperature" class="sr-only">ambient temperature</label>
+    <input
+      type="number"
+      id="todo-ambientTemperature"
+      formControlName="ambientTemperature"
+      class="form-control"
+      placeholder="18"
+      autocomplete="off"
+    />
+  </div>
+  <button type="submit" class="btn btn-primary mx-sm-3 mb-2">Update</button>
+</form>
