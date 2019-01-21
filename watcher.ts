@@ -30,7 +30,7 @@ cron.schedule('*/5 * * * *', () => {
       console.log(result);
     })
     .catch(err => {
-      console.error('measurements', err);
+      console.error('measurements', err.data);
     });
 });
 
@@ -43,6 +43,8 @@ const getAcState = axios
   .then(x => {
     const result = x.data.result.acState;
 
+    console.log('getAcState', x.data);
+
     admin
       .database()
       .ref('/')
@@ -52,12 +54,11 @@ const getAcState = axios
         thermostatMode: result.mode,
         temperature: result.targetTemperature,
         swing: result.swing,
+        fanSpeed: result.fanLevel,
       });
-
-    console.log(result);
   })
   .catch(err => {
-    console.error('acState', err);
+    console.error('acState', err.data);
   });
 
 Promise.all([getAcState]).then(() => {
@@ -71,6 +72,7 @@ Promise.all([getAcState]).then(() => {
         thermostatMode: string;
         temperature: number;
         swing: string;
+        fanSpeed: string;
       } = postSnapshot.val();
       console.log(val);
       axios
@@ -83,6 +85,7 @@ Promise.all([getAcState]).then(() => {
               mode: val.thermostatMode,
               targetTemperature: val.temperature,
               swing: val.swing,
+              fanLevel: val.fanSpeed,
             },
           },
         )
@@ -90,7 +93,14 @@ Promise.all([getAcState]).then(() => {
           console.log('ok acStates');
         })
         .catch(error => {
-          console.log(error);
+          console.log('Error:', error.response.data, {
+            acState: {
+              mode: val.thermostatMode,
+              targetTemperature: val.temperature,
+              swing: val.swing,
+              fanLevel: val.fanSpeed,
+            },
+          });
         });
     });
 
@@ -117,7 +127,7 @@ Promise.all([getAcState]).then(() => {
           console.log('ok OnOff');
         })
         .catch(error => {
-          console.log(error);
+          console.log('Error:', error.data);
         });
     });
 });

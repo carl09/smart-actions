@@ -27,33 +27,18 @@ export class TwoOutputComponent implements OnInit {
 
   public isRunning = false;
 
-  public labels: string[] = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '10',
-    '11',
-    '12',
-    '13',
-    '14',
-    '15',
-    '16',
-    '17',
-    '18',
-    '19',
-    '20',
-  ];
+  public labels: string[] = [];
 
   private trainer: Trainer<ModelTwoOutput>;
 
+  private times = 20;
+
   constructor() {
     this.trainer = new Trainer(ModelTwoOutput, 24);
+
+    for (let index = 0; index < this.times; index++) {
+      this.labels.push(`${index * 10}`);
+    }
   }
 
   ngOnInit(): void {}
@@ -68,19 +53,36 @@ export class TwoOutputComponent implements OnInit {
 
   private run() {
     console.log('run');
-    const other = this.trainer.run(20);
+    const other = this.trainer.run(this.times);
 
     const run = this.trainer.getBest();
 
     const t: ChartItem[] = [];
 
-    for (const r of run) {
-      t.push({
-        name: `${r.name} Split: ${r.result().split} Score: ${r.score()} `,
-        color: getRandomColor(),
-        values: r.getDiffs(),
-      });
-    }
+    const colors = {
+      1: 'red',
+      2: 'blue',
+      3: 'green',
+      4: 'pink',
+    };
+
+    t.push(
+      ...run.map((r, i) => {
+        return {
+          name: `${r.name} Split: ${r.result().split} Score: ${r.score()} `,
+          color: colors[i],
+          values: r.getDiffs(),
+        };
+      }),
+    );
+
+    // for (const r of run) {
+    //   t.push({
+    //     name: `${r.name} Split: ${r.result().split} Score: ${r.score()} `,
+    //     color: getRandomColor(),
+    //     values: r.getDiffs(),
+    //   });
+    // }
 
     for (const r of other) {
       t.push({

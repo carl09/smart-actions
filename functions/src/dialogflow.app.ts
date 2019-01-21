@@ -1,97 +1,83 @@
-import {
-  Carousel,
-  Contexts,
-  dialogflow,
-  DialogflowConversation,
-  List,
-  Suggestions,
-} from 'actions-on-google';
+import { dialogflow, Suggestions } from 'actions-on-google';
 import { globalDeviceId } from './constant';
-import { commandOnOff, commandSetTemperature, queryFirebase } from './device.model';
-
-export interface ColorConversation<
-  TData = IColor,
-  TUserStorage = IColorUser,
-  TContexts extends Contexts = Contexts
-> extends DialogflowConversation<TData, TUserStorage, TContexts> {}
-
-export interface IColor {
-  userName: string;
-}
-
-export interface IColorUser {
-  userName: string;
-}
-
-const configCarousel = (): List => {
-  const carousel = new List({
-    items: {
-      fan: {
-        title: 'Fan Speed',
-        description: 'The Fan Speed',
-        synonyms: ['fan', 'fan speed'],
-      },
-      temperature: {
-        title: 'Temperature',
-        description: 'The Temperature',
-        synonyms: ['temperature', 'heat'],
-      },
-      mode: {
-        title: 'Mode',
-        description: 'The Device Mode',
-        synonyms: ['heating', 'cooling'],
-      },
-    },
-  });
-  return carousel;
-};
+import {
+  commandOnOff,
+  commandSetFanSpeed,
+  commandSetTemperature,
+  queryFirebase,
+} from './device.model';
+import { askCanHelp, ColorConversation, configType } from './dialogflow.model';
 
 export const dialogflowApp = dialogflow<ColorConversation>({ debug: true });
 
 dialogflowApp.intent('Default Welcome Intent', conv => {
   return queryFirebase(globalDeviceId).then(data => {
-    let message = `off, would you like to turn it on?`;
+    let message = `currently off, would you like to turn it on?`;
     if (data.on) {
-      message = `set to ${data.thermostatMode}. How can i help?`;
+      message = `set to ${data.thermostatMode}.`;
     }
     conv.ask(
-      `Hi the current temputure is ${data.temperatureAmbient} and your device is ${message}`,
+      `Hi the current temputure is ${data.temperatureAmbient} degrees.  Your device is ${message}`,
     );
 
     if (!data.on) {
       conv.ask(new Suggestions('Yes', 'No'));
     } else {
-      if (conv.screen) {
-        const opt = conv.ask(configCarousel());
-
-        console.warn('opt', opt);
-
-        return opt;
-      }
+      askCanHelp(conv, true);
     }
-    return undefined;
   });
 });
 
 dialogflowApp.intent('Default Welcome Intent - yes', conv => {
   conv.ask(`Ok Turning it on now.`);
   commandOnOff(globalDeviceId, true);
+  askCanHelp(conv, false);
 });
 
-dialogflowApp.intent<{ configOptions: string }>('change_config', (conv, { configOptions }) => {
-  const config = conv.arguments.get('OPTION') || configOptions;
-  conv.ask(`about to change ${config}`);
+dialogflowApp.intent<{ configOptions: configType }>('change_config', (conv, { configOptions }) => {
+  const config: configType = (conv.arguments.get('OPTION') as configType) || configOptions;
+  // conv.ask(`about to change ${config}`);
 
-  // if (config === 'temperature'){
-  conv.followup('apply-config-temperature');
-  //   } else {
-  //     conv.close('Thanks');
-  //   }
-
-  //
+  if (config === 'temperature') {
+    conv.ask('What temperature would you like?');
+    // conv.followup('apply-config-temperature');
+  } else if (config === 'fan') {
+    conv.ask('What speed should I set the fan to?');
+    // conv.followup('apply-config-fan');
+  } else if (config === 'mode') {
+    conv.ask('What mode would you like?');
+    conv.ask(new Suggestions('Heat', 'Cool'));
+    // conv.followup('apply-config-mode');
+    // conv.ask()
+  } else {
+    conv.close('no valid config found');
+  }
 });
 
-dialogflowApp.intent<{ temperature: number }>('config_temperature', (conv, { temperature }) => {
-  commandSetTemperature(globalDeviceId, temperature);
-  conv.close('Thanks');
-});
+dialogflowApp.intent<{ configFanSpeed: string }>(
+  'change_config - fan',
+  (conv, { configFanSpeed }) => {
+    commandSetFanSpeed(globalDeviceId, configFanSpeed);
+    conv.ask(`Setting the fan to ${configFanSpeed} now`);
+    askCanHelp(conv, false);
+  },
+);
+
+// dialogflowApp.intent<{ temperature: number }>('config_temperature', (conv, { temperature }) => {
+//   commandSetTemperature(globalDeviceId, temperature);
+//   askCanHelp(conv, false);
+//   // conv.close('Done!');
+// });
+
+// dialogflowApp.intent<{ configMode: string }>('config_mode', (conv, { configMode }) => {
+//   conv.close('sorry dont know how to use the mode settings yet!' + configMode);
+//   askCanHelp(conv, false);
+
+// });
+
+// dialogflowApp.intent<{ configFanSpeed: string }>('config_fan', (conv, { configFanSpeed }) => {
+//   conv.close('sorry dont know how to use the fan settings yet!' + configFanSpeed);
+//   commandSetFanSpeed(globalDeviceId, configFanSpeed);
+//   askCanHelp(conv, false);
+//   // conv.close('Done!');
+// });

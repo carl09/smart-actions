@@ -68,10 +68,10 @@ export const queryDevice = (deviceId): Promise<DeviceStatus> =>
   queryFirebase(deviceId).then(data => ({
     online: true,
     on: data.on,
-    thermostatMode: data.thermostatMode || 'heat',
-    thermostatTemperatureSetpoint: data.thermostatTemperatureSetpoint || 21,
-    thermostatTemperatureAmbient: 18,
-    thermostatHumidityAmbient: 60,
+    thermostatMode: data.thermostatMode,
+    thermostatTemperatureSetpoint: data.thermostatTemperatureSetpoint,
+    thermostatTemperatureAmbient: data.temperatureAmbient,
+    thermostatHumidityAmbient: data.humidityAmbient,
   }));
 
 export const commandOnOff = (deviceId: string, toggle: boolean) => {
@@ -98,5 +98,14 @@ export const commandSetTemperature = (deviceId: string, temperature: number) => 
     .child('ThermostatMode')
     .update({
       temperature,
+    });
+};
+
+export const commandSetFanSpeed = (deviceId: string, fanSpeed: string) => {
+  firebaseRef
+    .child(deviceId)
+    .child('ThermostatMode')
+    .update({
+      fanSpeed,
     });
 };

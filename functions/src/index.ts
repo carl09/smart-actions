@@ -136,8 +136,6 @@ exports.reportstate = functions.database.ref('{deviceId}').onWrite((change, cont
   }
   const snapshotVal = change.after.val();
 
-  console.warn('snapshotVal', snapshotVal);
-
   const postData: SmartHomeV1ReportStateRequest = {
     requestId: shortid.generate(),
     agentUserId: globalAgentUserId,
